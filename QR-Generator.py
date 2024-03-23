@@ -14,7 +14,8 @@ class QRCodeGenerator(tk.Tk):
         self.qr_img = None
         self.qr_color = "white"
         self.bg_color = "#333333"
-        self.color_button_bg = self.bg_color
+        self.logo_img = None
+        self.logo_size = (50, 50)  # Standardgröße für das Logo
 
     def init_ui(self):
         self.entry_text = tk.StringVar(value="Link hier einfügen")
@@ -40,6 +41,10 @@ class QRCodeGenerator(tk.Tk):
         self.bg_color_button = tk.Button(self, text="Hintergrund wählen", command=self.choose_bg_color, padx=10, pady=5)
         self.bg_color_button.pack(pady=10)
         self.dark_style(self.bg_color_button)
+
+        self.logo_button = tk.Button(self, text="Logo hinzufügen", command=self.add_logo, padx=10, pady=5)
+        self.logo_button.pack(pady=10)
+        self.dark_style(self.logo_button)
 
         self.preview_label = tk.Label(self, bg="#333333")
         self.preview_label.pack(pady=20)
@@ -86,8 +91,11 @@ class QRCodeGenerator(tk.Tk):
         qr.add_data(url)
         qr.make(fit=True)
 
-        img = qr.make_image(fill_color=self.qr_color, back_color=self.bg_color).convert('RGB')
-        return img
+        qr_img = qr.make_image(fill_color=self.qr_color, back_color=self.bg_color).convert('RGB')
+        if self.logo_img:
+            logo = self.logo_img.resize(self.logo_size)  # Größe des Logos anpassen
+            qr_img.paste(logo, ((qr_img.size[0] - logo.size[0]) // 2, (qr_img.size[1] - logo.size[1]) // 2))
+        return qr_img
 
     def choose_color(self):
         color_code = colorchooser.askcolor(title="QR-Code Farbe wählen", initialcolor=self.qr_color)
@@ -99,6 +107,12 @@ class QRCodeGenerator(tk.Tk):
         color_code = colorchooser.askcolor(title="Hintergrundfarbe wählen", initialcolor=self.bg_color)
         if color_code:
             self.bg_color = color_code[1]
+            self.update_preview()
+
+    def add_logo(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Bilder", "*.png;*.jpg;*.jpeg")])
+        if file_path:
+            self.logo_img = Image.open(file_path)
             self.update_preview()
 
     def dark_style(self, widget, fg_color="#FFFFFF", bg_color="#333333"):
