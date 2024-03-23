@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 class QRCodeGenerator(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("QR-Code Generator")
+        self.title("QR Code Generator")
         self.configure(bg="#333333")
         self.geometry("400x600")
 
@@ -15,10 +15,10 @@ class QRCodeGenerator(tk.Tk):
         self.qr_color = "white"
         self.bg_color = "#333333"
         self.logo_img = None
-        self.logo_size = (50, 50)  # Standardgröße für das Logo
+        self.logo_size = (50, 50)  # Standard size for the logo
 
     def init_ui(self):
-        self.entry_text = tk.StringVar(value="Link hier einfügen")
+        self.entry_text = tk.StringVar(value="Insert link here")
         self.entry = tk.Entry(self, fg="#AAAAAA", textvariable=self.entry_text, width=40)
         self.entry.bind("<FocusIn>", self.on_entry_click)
         self.entry.bind("<FocusOut>", self.on_focusout)
@@ -26,23 +26,23 @@ class QRCodeGenerator(tk.Tk):
         self.dark_style(self.entry, "#AAAAAA")
         self.entry.config(highlightbackground="black", highlightcolor="black", highlightthickness=1)
 
-        self.generate_button = tk.Button(self, text="Vorschau", command=self.update_preview, padx=10, pady=5)
+        self.generate_button = tk.Button(self, text="Preview", command=self.update_preview, padx=10, pady=5)
         self.generate_button.pack(pady=10)
         self.dark_style(self.generate_button)
 
-        self.save_button = tk.Button(self, text="Speichern", command=self.save_qr_code, padx=10, pady=5)
+        self.save_button = tk.Button(self, text="Save", command=self.save_qr_code, padx=10, pady=5)
         self.save_button.pack(pady=10)
         self.dark_style(self.save_button)
 
-        self.color_button = tk.Button(self, text="QR-Farbe wählen", command=self.choose_color, padx=10, pady=5)
+        self.color_button = tk.Button(self, text="Choose QR Color", command=self.choose_color, padx=10, pady=5)
         self.color_button.pack(pady=10)
         self.dark_style(self.color_button)
 
-        self.bg_color_button = tk.Button(self, text="Hintergrund wählen", command=self.choose_bg_color, padx=10, pady=5)
+        self.bg_color_button = tk.Button(self, text="Choose Background Color", command=self.choose_bg_color, padx=10, pady=5)
         self.bg_color_button.pack(pady=10)
         self.dark_style(self.bg_color_button)
 
-        self.logo_button = tk.Button(self, text="Logo hinzufügen", command=self.add_logo, padx=10, pady=5)
+        self.logo_button = tk.Button(self, text="Add Logo", command=self.add_logo, padx=10, pady=5)
         self.logo_button.pack(pady=10)
         self.dark_style(self.logo_button)
 
@@ -50,22 +50,21 @@ class QRCodeGenerator(tk.Tk):
         self.preview_label.pack(pady=20)
 
     def on_entry_click(self, event):
-        """Wenn das Textfeld angeklickt wird, lösche den vordefinierten Text."""
-        if self.entry_text.get() == "Link hier einfügen":
+        """When the entry is clicked, delete the default text."""
+        if self.entry_text.get() == "Insert link here":
             self.entry.delete(0, tk.END)
-            self.entry.insert(0, '')
             self.entry.config(fg='white')
 
     def on_focusout(self, event):
-        """Wenn das Textfeld den Fokus verliert und leer ist, setze den vordefinierten Text."""
+        """When the entry loses focus and is empty, set the default text."""
         if not self.entry.get():
-            self.entry.insert(0, 'Link hier einfügen')
+            self.entry.insert(0, 'Insert link here')
             self.entry.config(fg='#AAAAAA')
 
     def update_preview(self):
         url = self.entry.get()
-        if url == "Link hier einfügen" or not url:
-            messagebox.showerror("Fehler", "Bitte gib einen gültigen Link ein.")
+        if url == "Insert link here" or not url:
+            messagebox.showerror("Error", "Please enter a valid link.")
             return
         
         self.qr_img = self.generate_qr_code(url)
@@ -75,7 +74,7 @@ class QRCodeGenerator(tk.Tk):
 
     def save_qr_code(self):
         if self.qr_img is None:
-            messagebox.showerror("Fehler", "Generiere zuerst einen QR-Code.")
+            messagebox.showerror("Error", "Generate a QR code first.")
             return
         file_path = filedialog.asksaveasfilename(defaultextension=".png")
         if file_path:
@@ -93,24 +92,24 @@ class QRCodeGenerator(tk.Tk):
 
         qr_img = qr.make_image(fill_color=self.qr_color, back_color=self.bg_color).convert('RGB')
         if self.logo_img:
-            logo = self.logo_img.resize(self.logo_size)  # Größe des Logos anpassen
+            logo = self.logo_img.resize(self.logo_size)  # Resize logo
             qr_img.paste(logo, ((qr_img.size[0] - logo.size[0]) // 2, (qr_img.size[1] - logo.size[1]) // 2))
         return qr_img
 
     def choose_color(self):
-        color_code = colorchooser.askcolor(title="QR-Code Farbe wählen", initialcolor=self.qr_color)
+        color_code = colorchooser.askcolor(title="Choose QR Color", initialcolor=self.qr_color)
         if color_code:
             self.qr_color = color_code[1]
             self.update_preview()
 
     def choose_bg_color(self):
-        color_code = colorchooser.askcolor(title="Hintergrundfarbe wählen", initialcolor=self.bg_color)
+        color_code = colorchooser.askcolor(title="Choose Background Color", initialcolor=self.bg_color)
         if color_code:
             self.bg_color = color_code[1]
             self.update_preview()
 
     def add_logo(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Bilder", "*.png;*.jpg;*.jpeg")])
+        file_path = filedialog.askopenfilename(filetypes=[("Images", "*.png;*.jpg;*.jpeg")])
         if file_path:
             self.logo_img = Image.open(file_path)
             self.update_preview()
